@@ -1,11 +1,10 @@
 import csv
-import shutil
 from datetime import datetime
-from tabulate import tabulate
-import pandas
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from tabulate import tabulate
 
 
 def scholar_scraper(keywords: list, num_pages, most_recent="yes"):
@@ -59,14 +58,17 @@ def scholar_scraper(keywords: list, num_pages, most_recent="yes"):
         writer.writeheader()
         writer.writerows(papers)
 
-    df = pandas.read_csv("csvs/papers.csv")
+    df = pd.read_csv("csvs/papers.csv")
     df = df.sort_values(by=["Rating"], ascending=False)
+    print(df)  # Empty df: why?
+
     headers = df.columns.tolist()
     headers.insert(0, 'Index')
     tabula = tabulate(df[["Rating", "Title"]], headers=headers, showindex=True, colalign=("left", "left", "left"),
                       tablefmt="simple", maxcolwidths=[5, 5, 120])
+
     print(tabula)
 
 
 if __name__ == "__main__":
-    scholar_scraper(["communities", "planktonic"], 1)
+    scholar_scraper(["planktonic", "communities"], 5)
