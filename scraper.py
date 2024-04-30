@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
@@ -35,17 +36,26 @@ def scholar_scraper(keywords: list, num_pages, most_recent="yes"):
                     continue
                 else:
                     title = title.replace(doc_type2, "")
+            title = title.replace("…\xa0and", "")
+            title = title.replace("\xa0…", "")
+            title = title.rstrip()
             title = title.lstrip()
             title_l = title.lower()
             keywords_l = [element.lower() for element in keywords]
             N = sum(title_l.count(element) for element in keywords_l)
-            rating = (N * 100) / len(keywords)
+            rating = (N * 5) / len(keywords)
             link = result.find("a")["href"]
             papers.append({"Title": title, "Rating": rating, "Link": link})
 
         page += 1
 
     print(papers)
+
+    field_names = ["Title", "Rating", "Link"]
+    with open ("csvs/papers.csv", "w", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=field_names)
+        writer.writeheader()
+        writer.writerows(papers)
 
 
 scholar_scraper(["communities", "planktonic"], 1)
