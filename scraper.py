@@ -1,5 +1,9 @@
 import csv
+import shutil
 from datetime import datetime
+from tabulate import tabulate
+import pandas
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
@@ -36,8 +40,8 @@ def scholar_scraper(keywords: list, num_pages, most_recent="yes"):
                     continue
                 else:
                     title = title.replace(doc_type2, "")
-            title = title.replace("…\xa0and", "")
-            title = title.replace("\xa0…", "")
+            title = title.replace("…\xa0and", "...")
+            title = title.replace("\xa0…", "...")
             title = title.rstrip()
             title = title.lstrip()
             title_l = title.lower()
@@ -45,17 +49,24 @@ def scholar_scraper(keywords: list, num_pages, most_recent="yes"):
             N = sum(title_l.count(element) for element in keywords_l)
             rating = (N * 5) / len(keywords)
             link = result.find("a")["href"]
-            papers.append({"Title": title, "Rating": rating, "Link": link})
+            papers.append({"Rating": rating, "Title": title, "Link": link})
 
         page += 1
 
-    print(papers)
-
-    field_names = ["Title", "Rating", "Link"]
-    with open ("csvs/papers.csv", "w", encoding="utf-8") as file:
+    field_names = ["Rating", "Title", "Link"]
+    with open("csvs/papers.csv", "w", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=field_names)
         writer.writeheader()
         writer.writerows(papers)
 
+    df = pandas.read_csv("csvs/papers.csv")
+    df = df.sort_values(by=["Rating"], ascending=False)
+    headers = df.columns.tolist()
+    headers.insert(0, 'Index')
+    tabula = tabulate(df[["Rating", "Title"]], headers=headers, showindex=True, colalign=("left", "left", "left"),
+                      tablefmt="simple", maxcolwidths=[5, 5, 120])
+    print(tabula)
 
-scholar_scraper(["communities", "planktonic"], 1)
+
+if __name__ == "__main__":
+    scholar_scraper(["communities", "planktonic"], 1)
