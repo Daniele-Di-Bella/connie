@@ -60,7 +60,7 @@ def scholar_scraper(keywords: list, num_pages, most_recent="yes"):
 
     df = pd.read_csv("csvs/papers.csv")
     df = df.sort_values(by=["Rating"], ascending=False)
-    print(df)  # Empty df: why?
+    # print(df)
 
     headers = df.columns.tolist()
     headers.insert(0, 'Index')
