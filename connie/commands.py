@@ -36,7 +36,8 @@ def print_df():
         col_widths.append(30)
     assert len(headers) == len(col_widths)
 
-    tabula = tabulate(new_df, headers=headers, showindex=True, tablefmt="simple", maxcolwidths=col_widths)
+    tabula = tabulate(new_df, headers=headers, showindex=True, tablefmt="simple", maxcolwidths=col_widths,
+                      stralign="left", numalign="left")
     print(tabula)
 
 
@@ -131,7 +132,15 @@ def delete(column, value):
         print("Nothing was deleted.")
 
 
-@click.command("clear_closed", help="Remove all the closed interactions from the DataFrame")
+@click.command("clear_closed", help="Remove all the closed interactions from the work_net DataFrame")
 def clear_closed():
     grouped_indices = df.groupby("status").groups
     closed = grouped_indices.get("closed", [])
+    for i in closed:
+        try:
+            json_index_to_drop = int((i + 2))
+            worksheet.delete_row(json_index_to_drop)
+        except Exception as e:
+            print(df.iloc[i])
+            print("An error occurred during the deletion of the row above:", e)
+    print("The closed interactions were removed successfully by the DataFrame.")

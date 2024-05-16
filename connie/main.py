@@ -1,7 +1,5 @@
 import click
-from connie.commands import add
-from connie.commands import delete
-from connie.commands import print_df
+import connie.commands
 
 @click.group()
 def cli():
@@ -11,9 +9,10 @@ def cli():
     pass
 
 
-cli.add_command(add)
-cli.add_command(delete)
-cli.add_command(print_df)
+cli.add_command(connie.commands.add)
+cli.add_command(connie.commands.delete)
+cli.add_command(connie.commands.print_df)
+cli.add_command(connie.commands.clear_closed)
 
 if __name__ == "__main__":
     cli()
