@@ -144,3 +144,4 @@ def clear_closed():
             print(df.iloc[i])
             print("An error occurred during the deletion of the row above:", e)
     print("The closed interactions were removed successfully by the DataFrame.")
+
