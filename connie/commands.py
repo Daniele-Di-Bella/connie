@@ -18,13 +18,15 @@ df = pd.DataFrame(data)
 @click.command("add", help="Add a row of data to the work_net DataFrame")
 def add():
     """"""
-    int_type = click.prompt("Which type of interaction you want to add?", type=click.Choice(["req_pos","adm"]))
+    int_type = click.prompt("Which type of interaction you want to add?", type=click.Choice(["req_pos", "adm"]))
     if int_type.lower() == "adm":
         object = click.prompt("Which is the object of the interaction?")
     else:
         object = ""
-    req_type = click.prompt("Are you applying for a position or asking for it?", type=click.Choice(["asking", "applying"]))
-    pos_type = click.prompt("What kind of position are you interested in?", type=click.Choice(["industry", "intern", "PhD"]))
+    req_type = click.prompt("Are you applying for a position or asking for it?",
+                            type=click.Choice(["asking", "applying"]))
+    pos_type = click.prompt("What kind of position are you interested in?",
+                            type=click.Choice(["industry", "intern", "PhD"]))
     deadline = ""
     if req_type.lower() == "applying":
         if click.confirm("There is a deadline?"):
@@ -58,5 +60,23 @@ def add():
     new_row = {'int_type': int_type, 'req_type': req_type, "pos_type": pos_type, 'deadline': deadline,
                "status": status, "qual1": qual1, "qual2": qual2, "name": name, "surname": surname,
                "institution": institution, "city": city, "project": project, "object": object, "email": email}
-    new_row = pd.DataFrame(new_row)
-    df.append(new_row, ignore_index=True)
+    df.loc[len(df.index)] = new_row
+    # print(df)
+
+    try:
+        worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+        print("The Google Sheet document was updated successfully :)")
+    except Exception as e:
+        print("An error has occurred during the update of the Google Sheet document:", e)
+
+
+@click.command("add", help="Add a row of data to the work_net DataFrame")
+def delete():
+    index_to_drop = df[df['B'] == 'z'].index
+    df.drop(index_to_drop)
+
+@click.command("clear_closed", help="Remove all the closed interactions from the DataFrame")
+def clear_closed():
+    grouped_indices = df.groupby("status").groups
+    closed = grouped_indices.get("closed", [])
+

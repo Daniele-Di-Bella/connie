@@ -4,6 +4,9 @@ from connie.commands import add
 
 @click.group()
 def cli():
+    """
+    Hi, connie here: what can I do for you?
+    """
     pass
 
 
