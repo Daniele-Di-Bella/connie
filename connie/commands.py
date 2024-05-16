@@ -16,8 +16,13 @@ data = worksheet.get_all_records()
 df = pd.DataFrame(data)
 
 
-@click.command("print_df", help="Add a row of data to the work_net DataFrame")
+@click.command("print_df")
 def print_df():
+    """
+    Give a visualization of the following columns of the DataFrame: Index, name, surname, institution,
+    city, email. Moreover, print_df() present an additional column with respect to the ones present in the DataFrame,
+    GSIndex, to underline the difference between the indices of a pandas DataFrame and a Google Sheet document.
+    """
     GSIndex = pd.Series((df.index + 2), name="GSIndex")
     df.insert(loc=0, column=GSIndex.name, value=GSIndex)
     new_df = df.drop(columns=["req_type", "pos_type", "deadline", "qual1", "qual2", "project", "object",
@@ -40,42 +45,56 @@ def add():
     """"""
     int_type = click.prompt("Which type of interaction you want to add?", type=click.Choice(["req_pos", "adm"]))
     if int_type.lower() == "adm":
+        req_type, pos_type, qual1, qual2, project, = "", "", "", "", ""
         object = click.prompt("Which is the object of the interaction?")
-    else:
-        object = ""
-    req_type = click.prompt("Are you applying for a position or asking for it?",
-                            type=click.Choice(["asking", "applying"]))
-    pos_type = click.prompt("What kind of position are you interested in?",
-                            type=click.Choice(["industry", "intern", "PhD"]))
-    deadline = ""
-    if req_type.lower() == "applying":
+        deadline = ""
         if click.confirm("There is a deadline?"):
             deadline = click.prompt("When is the deadline", type=click.DateTime(formats=["%d-%m-%Y"]))
-    status = click.prompt("Which is the status of the interaction?", type=click.Choice(["p", "wtr", "wmr", "closed"]))
-    qual1, qual2 = "", ""
-    if click.confirm("There is a reference person?"):
-        name = click.prompt("Which is the name of the person you're interacting with?")
-        surname = click.prompt("Which is the surname of the person you're interacting with?")
-        if click.confirm("The person you're interacting with is a Prof.?"):
-            qual1 = "Prof."
-        else:
-            qual1 = ""
-        if click.confirm("The person you're interacting with is a Dr.?"):
-            qual2 = "Dr."
-        else:
-            qual2 = ""
-    else:
+        status = click.prompt("Which is the status of the interaction?", type=click.Choice(["p", "wtr", "wmr", "closed"]))
         name, surname = "", ""
-    if click.confirm("There is a reference email?"):
-        email = click.prompt("Which is the email of the person you're interacting with?")
-    else:
+        if click.confirm("There is a reference person?"):
+            name = click.prompt("Which is the name of the person you're interacting with?")
+            surname = click.prompt("Which is the surname of the person you're interacting with?")
         email = ""
-    institution = click.prompt("Which institution/industry you're interacting with?")
-    city = click.prompt("In which city the person/institution is located?")
-    if click.confirm("Are you asking to take part to a project?"):
-        project = click.prompt("Which is the name of the project?")
+        if click.confirm("There is a reference email?"):
+            email = click.prompt("Which is the email of the person you're interacting with?")
+        institution = click.prompt("Which institution/industry you're interacting with?")
+        city = click.prompt("In which city the person/institution is located?")
     else:
-        project = ""
+        object = ""
+        req_type = click.prompt("Are you applying for a position or asking for it?",
+                                type=click.Choice(["asking", "applying"]))
+        pos_type = click.prompt("What kind of position are you interested in?",
+                                type=click.Choice(["industry", "intern", "PhD"]))
+        deadline = ""
+        if req_type.lower() == "applying":
+            if click.confirm("There is a deadline?"):
+                deadline = click.prompt("When is the deadline", type=click.DateTime(formats=["%d-%m-%Y"]))
+        status = click.prompt("Which is the status of the interaction?", type=click.Choice(["p", "wtr", "wmr", "closed"]))
+        qual1, qual2 = "", ""
+        if click.confirm("There is a reference person?"):
+            name = click.prompt("Which is the name of the person you're interacting with?")
+            surname = click.prompt("Which is the surname of the person you're interacting with?")
+            if click.confirm("The person you're interacting with is a Prof.?"):
+                qual1 = "Prof."
+            else:
+                qual1 = ""
+            if click.confirm("The person you're interacting with is a Dr.?"):
+                qual2 = "Dr."
+            else:
+                qual2 = ""
+        else:
+            name, surname = "", ""
+        if click.confirm("There is a reference email?"):
+            email = click.prompt("Which is the email of the person you're interacting with?")
+        else:
+            email = ""
+        institution = click.prompt("Which institution/industry you're interacting with?")
+        city = click.prompt("In which city the person/institution is located?")
+        if click.confirm("Are you asking to take part to a project?"):
+            project = click.prompt("Which is the name of the project?")
+        else:
+            project = ""
 
     new_row = {'int_type': int_type, 'req_type': req_type, "pos_type": pos_type, 'deadline': deadline,
                "status": status, "qual1": qual1, "qual2": qual2, "name": name, "surname": surname,
