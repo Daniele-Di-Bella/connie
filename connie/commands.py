@@ -2,6 +2,7 @@ import click
 import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
+from tabulate import tabulate
 
 # Necessary permits and access to the file
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -15,9 +16,23 @@ data = worksheet.get_all_records()
 df = pd.DataFrame(data)
 
 
-@click.command("print_doc", help="Add a row of data to the work_net DataFrame")
+@click.command("print_df", help="Add a row of data to the work_net DataFrame")
 def print_df():
-    print(df)
+    GSIndex = pd.Series((df.index + 2), name="GSIndex")
+    df.insert(loc=0, column=GSIndex.name, value=GSIndex)
+    new_df = df.drop(columns=["req_type", "pos_type", "deadline", "qual1", "qual2", "project", "object",
+                              "status", "int_type"])
+
+    headers = new_df.columns.tolist()
+    headers.insert(0, "Index")
+
+    col_widths = [7, 7, 20, 20]
+    for i in range(0, (len(headers) - 4)):
+        col_widths.append(30)
+    assert len(headers) == len(col_widths)
+
+    tabula = tabulate(new_df, headers=headers, showindex=True, tablefmt="simple", maxcolwidths=col_widths)
+    print(tabula)
 
 
 @click.command("add", help="Add a row of data to the work_net DataFrame")
