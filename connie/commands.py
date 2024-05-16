@@ -15,6 +15,11 @@ data = worksheet.get_all_records()
 df = pd.DataFrame(data)
 
 
+@click.command("print_doc", help="Add a row of data to the work_net DataFrame")
+def print_df():
+    print(df)
+
+
 @click.command("add", help="Add a row of data to the work_net DataFrame")
 def add():
     """"""
@@ -77,7 +82,7 @@ def delete(column, value):
     index_to_drop = df[df[column] == value].index
     print(df.iloc[index_to_drop])
     if click.confirm("You want to delete the row above?"):
-        json_index_to_drop = int((index_to_drop + 1)[0])  # Pandas index objects are tuples of value: the first element
+        json_index_to_drop = int((index_to_drop + 2)[0])  # Pandas index objects are tuples of value: the first element
         # of the tuple is the int64 that I'm searching. An Index object cannot be passed to delete_row() because it's
         # not JSON serializable. But also an int64 object has the same problem, that's why it shall be passed to the
         # int() function before being passed to delete_row()
