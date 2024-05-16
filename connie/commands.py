@@ -65,18 +65,34 @@ def add():
 
     try:
         worksheet.update([df.columns.values.tolist()] + df.values.tolist())
-        print("The Google Sheet document was updated successfully :)")
+        print("The Google Sheet document was updated successfully.")
     except Exception as e:
         print("An error has occurred during the update of the Google Sheet document:", e)
 
 
-@click.command("add", help="Add a row of data to the work_net DataFrame")
-def delete():
-    index_to_drop = df[df['B'] == 'z'].index
-    df.drop(index_to_drop)
+@click.command("delete", help="Delete a row of data from the work_net DataFrame")
+@click.argument("column")
+@click.argument("value")
+def delete(column, value):
+    index_to_drop = df[df[column] == value].index
+    print(df.iloc[index_to_drop])
+    if click.confirm("You want to delete the row above?"):
+        json_index_to_drop = int((index_to_drop + 1)[0])  # Pandas index objects are tuples of value: the first element
+        # of the tuple is the int64 that I'm searching. An Index object cannot be passed to delete_row() because it's
+        # not JSON serializable. But also an int64 object has the same problem, that's why it shall be passed to the
+        # int() function before being passed to delete_row()
+
+        # print(type(json_index_to_drop))
+        try:
+            worksheet.delete_row(json_index_to_drop)
+            print("The Google Sheet document was updated successfully.")
+        except Exception as e:
+            print("An error has occurred during the update of the Google Sheet document:", e)
+    else:
+        print("Nothing was deleted.")
+
 
 @click.command("clear_closed", help="Remove all the closed interactions from the DataFrame")
 def clear_closed():
     grouped_indices = df.groupby("status").groups
     closed = grouped_indices.get("closed", [])
-
